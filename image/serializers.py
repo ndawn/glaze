@@ -2,14 +2,14 @@
 from image.models import Image
 
 from django.urls import reverse
-from rest_framework.serializers import ModelSerializer, URLField
+from rest_framework.serializers import ModelSerializer
 from rest_framework.fields import SerializerMethodField
 
 
 class ImageSerializer(ModelSerializer):
     class Meta:
         model = Image
-        fields = ['id', 'url', 'name', 'mime', 'tags']
+        fields = ['id', 'url', 'name', 'extension', 'mime', 'tags']
 
     url = SerializerMethodField()
 

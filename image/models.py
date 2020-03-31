@@ -18,7 +18,7 @@ class Image(models.Model):
         default='',
     )
 
-    file_type = models.CharField(
+    extension = models.CharField(
         max_length=32,
         default='',
     )

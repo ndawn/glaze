@@ -9,7 +9,6 @@ DEBUG = False
 
 ALLOWED_HOSTS = []
 
-
 AUTH_USER_MODEL = 'accounts.User'
 
 
@@ -106,11 +105,13 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
+        'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ]
 }
 
-FILETYPE_DETECTION_BYTES_READ_COUNT = 16
+FILETYPE_DETECTION_BYTE_SEQUENCE_LENGTH = 2048
+
+MAX_FILE_SIZE = 10485760
