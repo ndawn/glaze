@@ -1,30 +1,36 @@
 from typing import Union, Tuple
 
+from django.conf import settings
 
-def detect_file_type(first_bytes: Union[bytes, bytearray]) -> Union[Tuple[str, str], Tuple[None, None]]:
-    for extension in _FILETYPES.keys():
-        if extension in _CUSTOM_DETECTION_ALGORITHM:
-            if _CUSTOM_DETECTION_ALGORITHM[extension](first_bytes):
-                return extension, _FILETYPES[extension]['mime']
+
+def detect_file_type(file_path: str) -> Union[Tuple[str, str], Tuple[None, None]]:
+    with open(file_path, 'rb') as file:
+        first_bytes = file.read(settings.FILETYPE_DETECTION_BYTES_READ_COUNT)
+
+    for extension in FILETYPES.keys():
+        if extension in CUSTOM_DETECTION_ALGORITHM:
+            if CUSTOM_DETECTION_ALGORITHM[extension](first_bytes):
+                return extension, FILETYPES[extension]['mime']
         else:
-            for magic_bytes in _FILETYPES[extension]['magic_bytes']:
+            for magic_bytes in FILETYPES[extension]['magic_bytes']:
                 if first_bytes.startswith(magic_bytes):
-                    return extension, _FILETYPES[extension]['mime']
+                    return extension, FILETYPES[extension]['mime']
+
     return None, None
 
 
 def is_webp(first_bytes: Union[bytes, bytearray]) -> bool:
-    if (first_bytes[:4] == _FILETYPES['webp']['magic_bytes'][0][:4]) \
-            and (first_bytes[8:12] == _FILETYPES['webp']['magic_bytes'][0][8:12]):
+    if (first_bytes[:4] == FILETYPES['webp']['magic_bytes'][0][:4]) \
+            and (first_bytes[8:12] == FILETYPES['webp']['magic_bytes'][0][8:12]):
         return True
 
 
-_CUSTOM_DETECTION_ALGORITHM = {
+CUSTOM_DETECTION_ALGORITHM = {
     'webp': is_webp,
 }
 
 
-_FILETYPES = {
+FILETYPES = {
     'jpeg': {
         'mime': 'image/jpeg',
         'magic_bytes': [

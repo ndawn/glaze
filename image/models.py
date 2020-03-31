@@ -18,6 +18,11 @@ class Image(models.Model):
         default='',
     )
 
+    file_type = models.CharField(
+        max_length=32,
+        default='',
+    )
+
     mime = models.CharField(
         max_length=64,
         default='',
