@@ -97,6 +97,9 @@ class UploadView(CreateAPIView, RetrieveModelMixin):
 
         destination_file.close()
 
+        if file_type is None and file_mime is None:
+            return Response({'error': 'invalid file type'}, status=400)
+
         destination_file_path_with_extension = f'{destination_file_path}.{file_type}'
 
         os.rename(destination_file_path, destination_file_path_with_extension)
