@@ -1,0 +1,12 @@
+.idea/
+env/
+media/storage/*
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+*.log
+settings.py
+db.sqlite3
+db.sqlite3-journal
