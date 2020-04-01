@@ -1,4 +1,4 @@
-from accounts.views import UserViewSet
+from accounts.views import UserViewSet, RegisterView
 from image.views import ImageViewSet, UploadView, ImageRetrieveView, URLUploadView
 
 from django.urls import path
@@ -11,8 +11,9 @@ router.register(r'users', UserViewSet, basename='users')
 router.register(r'images', ImageViewSet, basename='images')
 
 urlpatterns = [
-    path('authorize/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('authorize/', TokenObtainPairView.as_view(), name='token_obtain'),
+    path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('auth/token/obtain/', TokenObtainPairView.as_view(), name='token_obtain'),
+    path('auth/register/', RegisterView.as_view(), name='register'),
     path('upload_url/', URLUploadView.as_view(), name='url_upload'),
     path('upload/', UploadView.as_view(), name='upload'),
     path('<pk>/', ImageRetrieveView.as_view(), name='image_view'),

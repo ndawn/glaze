@@ -2,17 +2,18 @@ import os.path
 import uuid
 from urllib.request import urlretrieve
 
-from rest_framework.permissions import AllowAny
-
+from image.exceptions import NoFileProvided, NoURLProvided, MaxFileSizeExceeded
 from image.models import Image
+from image.permissions import IsImageOwner
 from image.serializers import ImageSerializer
 from image.upload import UploadedImageProcessor
 
 from django.http import HttpResponse
 from django.urls import reverse
+from rest_framework.permissions import AllowAny
 from rest_framework.parsers import FileUploadParser
 from rest_framework.generics import CreateAPIView, RetrieveAPIView
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from django.conf import settings
@@ -22,6 +23,7 @@ import requests
 class ImageViewSet(viewsets.ModelViewSet):
     queryset = Image.objects.all()
     serializer_class = ImageSerializer
+    permission_classes = (IsImageOwner, )
 
     def retrieve(self, request, *args, pk=None, **kwargs):
         instance = get_object_or_404(self.queryset, pk=pk)
@@ -40,7 +42,7 @@ class ImageViewSet(viewsets.ModelViewSet):
 
 class ImageRetrieveView(RetrieveAPIView):
     queryset = Image.objects.all()
-    authentication_classes = [AllowAny]
+    permission_classes = (AllowAny, )
 
     def retrieve(self, request, *args, pk=None, **kwargs):
         instance = get_object_or_404(self.queryset, pk=pk)
@@ -50,16 +52,16 @@ class ImageRetrieveView(RetrieveAPIView):
 
 class UploadView(CreateAPIView):
     queryset = Image.objects.none()
-    parser_classes = [FileUploadParser]
+    parser_classes = (FileUploadParser, )
 
     def post(self, request, *args, **kwargs):
         if 'file' not in request.FILES:
-            return Response({'error': 'no image provided'}, status=400)
+            raise NoFileProvided()
 
         source_file = request.FILES['file']
 
         if source_file.size > settings.MAX_FILE_SIZE:
-            return Response({'error': 'file size exceeds the limit'}, status=400)
+            raise MaxFileSizeExceeded()
 
         file_uuid = uuid.uuid4()
 
@@ -92,7 +94,7 @@ class URLUploadView(CreateAPIView):
 
     def post(self, request, *args, **kwargs):
         if 'url' not in request.data:
-            return Response({'error': 'no url provided'}, status=400)
+            raise NoURLProvided()
 
         file_name = os.path.basename(request.data['url'])
         file_uuid = uuid.uuid4()
@@ -106,7 +108,7 @@ class URLUploadView(CreateAPIView):
         head_response = requests.head(request.data['url'])
 
         if int(head_response.headers.get('Content-Length')) > settings.MAX_FILE_SIZE:
-            return Response({'error': 'file size exceeds the limit'}, status=400)
+            raise MaxFileSizeExceeded()
 
         urlretrieve(request.data['url'], destination_file_path)
 
@@ -118,4 +120,4 @@ class URLUploadView(CreateAPIView):
         )
 
         return Response(headers={'Location': reverse('images-detail', kwargs={'pk': str(file_uuid)})},
-                        status=303)
+                        status=status.HTTP_303_SEE_OTHER)

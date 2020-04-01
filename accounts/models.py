@@ -43,7 +43,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     email = models.EmailField(
-        default='',
+        blank=False,
+        null=False,
         unique=True,
         max_length=128,
         verbose_name='Адрес электронной почты',
@@ -55,15 +56,15 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
 
     last_name = models.CharField(
-        default='',
-        blank=True,
+        null=False,
+        blank=False,
         max_length=128,
         verbose_name='Фамилия',
     )
 
     first_name = models.CharField(
-        default='',
-        blank=True,
+        null=False,
+        blank=False,
         max_length=128,
         verbose_name='Имя',
     )
@@ -75,8 +76,10 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = 'email'
 
-    def get_full_name(self):
-        return ' '.join([self.first_name, self.last_name])
+    @property
+    def full_name(self):
+        return f'{self.first_name} {self.last_name}'
 
-    def get_short_name(self):
+    @property
+    def short_name(self):
         return self.first_name
