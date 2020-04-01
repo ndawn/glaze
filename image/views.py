@@ -78,15 +78,14 @@ class UploadView(CreateAPIView):
 
         destination_file.close()
 
-        UploadedImageProcessor.create(
+        instance = UploadedImageProcessor.create(
             file_uuid=file_uuid,
             file_path=destination_file_path,
             file_name=source_file.name,
             file_owner=request.user,
         )
 
-        return Response(headers={'Location': reverse('images-detail', kwargs={'pk': str(file_uuid)})},
-                        status=303)
+        return Response(ImageSerializer(instance).data, status=status.HTTP_201_CREATED)
 
 
 class URLUploadView(CreateAPIView):
@@ -112,12 +111,11 @@ class URLUploadView(CreateAPIView):
 
         urlretrieve(request.data['url'], destination_file_path)
 
-        UploadedImageProcessor.create(
+        instance = UploadedImageProcessor.create(
             file_uuid=file_uuid,
             file_path=destination_file_path,
             file_name=file_name,
             file_owner=request.user,
         )
 
-        return Response(headers={'Location': reverse('images-detail', kwargs={'pk': str(file_uuid)})},
-                        status=status.HTTP_303_SEE_OTHER)
+        return Response(ImageSerializer(instance).data)

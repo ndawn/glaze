@@ -2,10 +2,10 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from accounts.models import User
-from accounts.serializers import UserSerializer
+from accounts.serializers import UserSerializer, UserCreateSerializer
 
 from rest_framework.generics import CreateAPIView
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -24,9 +24,9 @@ class RegisterView(CreateAPIView):
             'first_name': request.data.get('first_name'),
         }
 
-        serializer = UserSerializer(data=fields)
+        serializer = UserCreateSerializer(data=fields)
 
         serializer.is_valid(raise_exception=True)
 
-        serializer.create(serializer.validated_data)
-        return Response(serializer.validated_data)
+        user = serializer.create(serializer.validated_data)
+        return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
