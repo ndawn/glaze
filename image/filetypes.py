@@ -1,6 +1,7 @@
 from typing import Union, Tuple
 from abc import ABC, abstractmethod
 
+from PIL import Image
 from django.conf import settings
 
 
@@ -91,10 +92,14 @@ FILETYPE_CHECKERS = [JpegFileTypeChecker, PngFileTypeChecker, TiffFileTypeChecke
 
 def check_file_type(file_path: str) -> Tuple[str, str]:
     with open(file_path, 'rb') as file:
-        detection_byte_sequence = file.read(settings.FILETYPE_DETECTION_BYTE_SEQUENCE_LENGTH)
+        detection_byte_sequence = file.read(settings.GLAZE['FILETYPE_DETECTION_BYTE_SEQUENCE_LENGTH'])
 
     for checker in FILETYPE_CHECKERS:
         if checker.check(detection_byte_sequence):
             return checker.get_file_type()
 
     raise ValueError('Unsupported file type')
+
+
+for checker in FILETYPE_CHECKERS:
+    Image.register_mime(checker.extension.upper(), checker.mime)

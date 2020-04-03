@@ -1,5 +1,6 @@
 from accounts.views import UserViewSet, RegisterView
 from image.views import ImageViewSet, UploadView, ImageRetrieveView, URLUploadView
+from transform.views import TransformView
 
 from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
@@ -16,6 +17,6 @@ urlpatterns = [
     path('auth/register/', RegisterView.as_view(), name='register'),
     path('upload_url/', URLUploadView.as_view(), name='url_upload'),
     path('upload/', UploadView.as_view(), name='upload'),
+    path('<pk>/transform/', TransformView.as_view(), name='image_transform'),
     path('<pk>/', ImageRetrieveView.as_view(), name='image_view'),
-    # path('image/<id>/<transformations>/', TransformView.as_view(), name='image_transform'),
 ] + router.urls

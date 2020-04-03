@@ -60,7 +60,7 @@ class UploadView(CreateAPIView):
 
         source_file = request.FILES['file']
 
-        if source_file.size > settings.MAX_FILE_SIZE:
+        if source_file.size > settings.GLAZE['MAX_FILE_SIZE']:
             raise MaxFileSizeExceeded()
 
         file_uuid = uuid.uuid4()
@@ -106,7 +106,7 @@ class URLUploadView(CreateAPIView):
 
         head_response = requests.head(request.data['url'])
 
-        if int(head_response.headers.get('Content-Length')) > settings.MAX_FILE_SIZE:
+        if int(head_response.headers.get('Content-Length')) > settings.GLAZE['MAX_FILE_SIZE']:
             raise MaxFileSizeExceeded()
 
         urlretrieve(request.data['url'], destination_file_path)

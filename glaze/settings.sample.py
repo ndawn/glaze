@@ -1,4 +1,8 @@
 import os
+from datetime import timedelta
+
+from PIL import Image
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -8,6 +12,7 @@ SECRET_KEY = ''
 DEBUG = False
 
 ALLOWED_HOSTS = []
+
 
 AUTH_USER_MODEL = 'accounts.User'
 
@@ -112,6 +117,13 @@ REST_FRAMEWORK = {
     ]
 }
 
-FILETYPE_DETECTION_BYTE_SEQUENCE_LENGTH = 2048
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
+}
 
-MAX_FILE_SIZE = 10485760
+GLAZE = {
+    'FILETYPE_DETECTION_BYTE_SEQUENCE_LENGTH': 2048,
+    'MAX_FILE_SIZE': 10485760,
+    'HASH_BYTE_ARRAY_LENGTH': 16,
+    'TEMP_DIRECTORY': '/tmp',
+}
