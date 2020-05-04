@@ -15,6 +15,9 @@ class UploadedImageProcessor:
 
         os.rename(file_path, file_path_with_extension)
 
+        if file_owner.is_anonymous:
+            file_owner = User.objects.get(id=0)
+
         return Image.objects.create(
             id=file_uuid,
             name=file_name,

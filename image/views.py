@@ -2,9 +2,9 @@ import os.path
 import uuid
 from urllib.request import urlretrieve
 
-from image.exceptions import NoFileProvided, NoURLProvided, MaxFileSizeExceeded
+from image.exceptions import NoFileProvided, NoURLProvided, MaxFileSizeExceeded, UnsupportedFileType
 from image.models import Image
-from image.permissions import IsImageOwner
+from image.permissions import IsImageOwner, IsImageOwnerOrAnonymous
 from image.serializers import ImageSerializer
 from image.upload import UploadedImageProcessor
 
@@ -23,7 +23,7 @@ import requests
 class ImageViewSet(viewsets.ModelViewSet):
     queryset = Image.objects.all()
     serializer_class = ImageSerializer
-    permission_classes = (IsImageOwner, )
+    permission_classes = (IsImageOwnerOrAnonymous, )
 
     def retrieve(self, request, *args, pk=None, **kwargs):
         instance = get_object_or_404(self.queryset, pk=pk)
@@ -78,12 +78,15 @@ class UploadView(CreateAPIView):
 
         destination_file.close()
 
-        instance = UploadedImageProcessor.create(
-            file_uuid=file_uuid,
-            file_path=destination_file_path,
-            file_name=source_file.name,
-            file_owner=request.user,
-        )
+        try:
+            instance = UploadedImageProcessor.create(
+                file_uuid=file_uuid,
+                file_path=destination_file_path,
+                file_name=source_file.name,
+                file_owner=request.user,
+            )
+        except ValueError as exc:
+            raise UnsupportedFileType()
 
         return Response(ImageSerializer(instance).data, status=status.HTTP_201_CREATED)
 

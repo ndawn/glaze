@@ -18,3 +18,9 @@ class MaxFileSizeExceeded(APIException):
     default_detail = 'File size exceeds the limit'
     default_code = 'max_file_size_exceeded'
     status_code = status.HTTP_413_REQUEST_ENTITY_TOO_LARGE
+
+
+class UnsupportedFileType(APIException):
+    default_detail = 'Unsupported file type'
+    default_code = 'unsupported_file_type'
+    status_code = status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
