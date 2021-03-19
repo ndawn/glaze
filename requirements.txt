@@ -4,7 +4,7 @@ chardet==3.0.4
 Django==3.0.7
 django-rest-framework==0.1.0
 django-templated-mail==1.1.1
-djangorestframework==3.11.0
+djangorestframework==3.11.2
 djangorestframework-simplejwt==4.4.0
 idna==2.9
 ImageHash==4.0
